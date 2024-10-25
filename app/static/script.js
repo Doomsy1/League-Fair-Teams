@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addSummonerButton = document.getElementById('add-summoner-button');
     const buttonText = document.getElementById('button-text');
     const buttonSpinner = document.getElementById('button-spinner');
-    const gamesSlider = document.getElementById('games-slider');
+    const matchesSlider = document.getElementById('matches-slider');
     const sliderTooltip = document.getElementById('slider-tooltip');
 
     // Load teams from localStorage
@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tagLineInput = document.getElementById('tag-line');
         const gameName = gameNameInput.value.trim();
         const tagLine = tagLineInput.value.trim();
+        const numOfMatches = document.getElementById('matches-slider').value;
 
         if (!gameName || !tagLine) {
             alert('Both Game Name and Tag Line are required.');
@@ -154,7 +155,11 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ game_name: gameName, tag_line: tagLine })
+            body: JSON.stringify({ 
+                game_name: gameName, 
+                tag_line: tagLine,
+                num_of_matches: parseInt(numOfMatches)
+            })
         })
         .then(response => response.json())
         .then(data => {
@@ -309,35 +314,35 @@ document.addEventListener('DOMContentLoaded', () => {
         attachActionListeners();
     }
 
-    // Slider for Games to Analyze with Tooltip
-    gamesSlider.addEventListener('input', () => {
-        const value = gamesSlider.value;
+    // Slider for Matches to Analyze with Tooltip
+    matchesSlider.addEventListener('input', () => {
+        const value = matchesSlider.value;
         sliderTooltip.textContent = value;
 
         // Calculate the position of the tooltip
-        const sliderRect = gamesSlider.getBoundingClientRect();
+        const sliderRect = matchesSlider.getBoundingClientRect();
         const tooltipWidth = sliderTooltip.offsetWidth;
-        const sliderWidth = gamesSlider.offsetWidth;
-        const thumbPosition = (value - gamesSlider.min) / (gamesSlider.max - gamesSlider.min);
+        const sliderWidth = matchesSlider.offsetWidth;
+        const thumbPosition = (value - matchesSlider.min) / (matchesSlider.max - matchesSlider.min);
         const tooltipX = thumbPosition * sliderWidth;
 
         // Position the tooltip
         sliderTooltip.style.left = `${tooltipX}px`;
     });
 
-    gamesSlider.addEventListener('mousedown', () => {
+    matchesSlider.addEventListener('mousedown', () => {
         sliderTooltip.style.display = 'block';
     });
 
-    gamesSlider.addEventListener('mouseup', () => {
+    matchesSlider.addEventListener('mouseup', () => {
         sliderTooltip.style.display = 'none';
     });
 
-    gamesSlider.addEventListener('touchstart', () => {
+    matchesSlider.addEventListener('touchstart', () => {
         sliderTooltip.style.display = 'block';
     });
 
-    gamesSlider.addEventListener('touchend', () => {
+    matchesSlider.addEventListener('touchend', () => {
         sliderTooltip.style.display = 'none';
     });
 

@@ -3,10 +3,23 @@
 from flask import Blueprint, render_template, request, jsonify, current_app
 import urllib.parse
 import requests
+from .mmr_calculator import MMRCalculator  # Import the new MMRCalculator module
 
 routes = Blueprint('routes', __name__)
 
-def calculate_mmr(tier, division, league_points, summoner_level):
+def calculate_base_mmr(tier, division, league_points, summoner_level):
+    """
+    Calculate the base MMR based on the tier, division, league points, and summoner level.
+    
+    Args:
+        tier (str): The tier of the summoner.
+        division (str): The division of the summoner.
+        league_points (int): The league points of the summoner.
+        summoner_level (int): The level of the summoner.
+        
+    Returns:
+        int: The calculated base MMR.
+    """
     tiers = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Master', 'Grandmaster', 'Challenger']
     divisions = {'IV': 0, 'III': 1, 'II': 2, 'I': 3}
     mmr = 0
@@ -29,27 +42,66 @@ def index():
 
 @routes.route('/get_summoner_data', methods=['POST'])
 def get_summoner_data():
+    """
+    Get summoner data from the Riot API and calculate MMR.
+    
+    Request JSON data format:
+    {
+        "game_name": "summoner_name",
+        "tag_line": "tag_line",
+        "num_of_matches": 20
+    }
+    
+    Response JSON data format:
+    {
+        "status": "success" or "error",
+        "summoner": {
+            "game_name": "summoner_name",
+            "tag_line": "tag_line",
+            "puuid": "puuid",
+            "accountId": "accountId",
+            "summoner_id": "summoner_id",
+            "icon_url": "icon_url",
+            "level": 30,
+            "rank": "Gold IV (75 LP)",
+            "tier": "Gold",
+            "division": "IV",
+            "league_points": 75,
+            "wins": 100,
+            "losses": 80,
+            "win_rate": 56,
+            "mmr": 2300
+        }
+    }
+    """
     data = request.get_json()
-    game_name = data.get('game_name')
-    tag_line = data.get('tag_line')
+    user_game_name = data.get('game_name')
+    user_tag_line = data.get('tag_line')
+    num_of_matches = data.get('num_of_matches', 20)  # Default to 20 matches if not specified
 
-    if not game_name or not tag_line:
+    if not user_game_name or not user_tag_line:
         return jsonify({'status': 'error', 'message': 'Both Game Name and Tag Line are required.'}), 400
 
     try:
         RIOT_API_KEY = current_app.config['RIOT_API_KEY']
-        encoded_game_name = urllib.parse.quote(game_name)
-        encoded_tag_line = urllib.parse.quote(tag_line)
+        encoded_game_name = urllib.parse.quote(user_game_name)
+        encoded_tag_line = urllib.parse.quote(user_tag_line)
         riot_api_url = f"https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_game_name}/{encoded_tag_line}?api_key={RIOT_API_KEY}"
         response = requests.get(riot_api_url)
+        
         if response.status_code == 200:
-            data = response.json()
-            puuid = data['puuid']
+            account_data = response.json()
+            puuid = account_data['puuid']
+            
+            # Extract the correctly cased gameName and tagLine from Riot API response
+            correct_game_name = account_data.get('gameName', user_game_name)
+            correct_tag_line = account_data.get('tagLine', user_tag_line)
 
             # Now use the puuid to get additional summoner data
             encrypted_puuid = urllib.parse.quote(puuid)
             summoner_api_url = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{encrypted_puuid}?api_key={RIOT_API_KEY}"
             summoner_response = requests.get(summoner_api_url)
+            
             if summoner_response.status_code == 200:
                 summoner_data = summoner_response.json()
                 accountId = summoner_data['accountId']
@@ -61,6 +113,7 @@ def get_summoner_data():
                 encrypted_summoner_id = urllib.parse.quote(summoner_id)
                 league_api_url = f"https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/{encrypted_summoner_id}?api_key={RIOT_API_KEY}"
                 league_response = requests.get(league_api_url)
+                
                 if league_response.status_code == 200:
                     league_data = league_response.json()
                     # Get ranked solo queue data
@@ -91,8 +144,8 @@ def get_summoner_data():
                     losses = 0
                     win_rate = 0
 
-                # Calculate MMR
-                mmr = calculate_mmr(tier, division, league_points, summoner_level)
+                # Calculate base MMR
+                base_mmr = calculate_base_mmr(tier, division, league_points, summoner_level)
 
                 # Get latest version for icon URL
                 version_response = requests.get('https://ddragon.leagueoflegends.com/api/versions.json')
@@ -104,12 +157,23 @@ def get_summoner_data():
 
                 icon_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/profileicon/{profile_icon_id}.png"
 
-                # Return summoner data with MMR
+                # Initialize MMR Calculator
+                mmr_calculator = MMRCalculator(RIOT_API_KEY, num_of_matches)
+                calculated_mmr = mmr_calculator.calculate_mmr({
+                    'puuid': puuid,
+                    'league_points': league_points,
+                    'tier': tier,
+                    'division': division,
+                    'summoner_level': summoner_level,
+                    'mmr': base_mmr
+                })
+
+                # Return summoner data with updated MMR and corrected gameName and tagLine
                 return jsonify({
                     'status': 'success',
                     'summoner': {
-                        'game_name': game_name,
-                        'tag_line': tag_line,
+                        'game_name': correct_game_name,    # Use correctly cased gameName from Riot API
+                        'tag_line': correct_tag_line,      # Use correctly cased tagLine from Riot API
                         'puuid': puuid,
                         'accountId': accountId,
                         'summoner_id': summoner_id,
@@ -122,7 +186,7 @@ def get_summoner_data():
                         'wins': wins,
                         'losses': losses,
                         'win_rate': win_rate,
-                        'mmr': mmr  # Include MMR in the response
+                        'mmr': calculated_mmr  # Updated MMR in the response
                     }
                 }), 200
             else:
