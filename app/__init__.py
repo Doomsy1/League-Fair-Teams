@@ -12,7 +12,7 @@ def create_app():
     RIOT_API_KEY = os.getenv('RIOT_API_KEY')
     app.config['RIOT_API_KEY'] = RIOT_API_KEY
 
-    app.secret_key = 'your_secret_key_here'  # Replace with a secure key in production
+    app.secret_key = 'secret'
 
     # Register Blueprints
     with app.app_context():
