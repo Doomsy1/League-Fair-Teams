@@ -35,57 +35,75 @@ document.addEventListener('DOMContentLoaded', () => {
         li.classList.add('player-item');
         li.setAttribute('data-name', `${summoner.game_name}#${summoner.tag_line}`);
 
-        const playerIcon = document.createElement('div');
-        playerIcon.classList.add('player-icon');
-        const img = document.createElement('img');
-        img.src = summoner.icon_url;
-        img.alt = 'Icon';
-        playerIcon.appendChild(img);
+        const card = document.createElement('div');
+        card.classList.add('card');
 
-        const playerInfo = document.createElement('div');
-        playerInfo.classList.add('player-info');
+        const iconImg = document.createElement('img');
+        iconImg.src = summoner.icon_url;
+        iconImg.alt = 'Icon';
 
-        const playerHeader = document.createElement('div');
-        playerHeader.classList.add('player-header');
-        const playerName = document.createElement('span');
-        playerName.classList.add('player-name');
-        playerName.textContent = summoner.game_name;
-        playerHeader.appendChild(playerName);
+        const cardContent = document.createElement('div');
+        cardContent.classList.add('card-content');
 
-        const playerRankContainer = document.createElement('div');
-        playerRankContainer.classList.add('player-rank-container');
-        const playerRank = document.createElement('span');
-        playerRank.classList.add('player-rank', summoner.tier.toLowerCase());
-        playerRank.textContent = summoner.rank;
-        const rankImg = document.createElement('img');
-        rankImg.src = `/static/images/ranks/${summoner.tier.toLowerCase()}.webp`;
-        rankImg.alt = `${summoner.tier} Rank`;
-        rankImg.classList.add('rank-image');
-        playerRank.appendChild(rankImg);
-        playerRankContainer.appendChild(playerRank);
+        const nameHeading = document.createElement('h2');
+        nameHeading.textContent = summoner.game_name;
+        const tagSpan = document.createElement('span');
+        tagSpan.style.fontWeight = 'normal';
+        tagSpan.style.fontSize = '18px';
+        tagSpan.style.opacity = '0.7';
+        tagSpan.textContent = `#${summoner.tag_line}`;
+        nameHeading.appendChild(tagSpan);
 
-        const actionButtons = document.createElement('div');
-        actionButtons.classList.add('action-buttons');
+        const winrateParagraph = document.createElement('p');
+        winrateParagraph.textContent = `${summoner.win_rate}% W/L`;
+        if (summoner.win_rate > 50) {
+            winrateParagraph.classList.add('winrate-green');
+        } else if (summoner.win_rate < 50) {
+            winrateParagraph.classList.add('winrate-red');
+        } else {
+            winrateParagraph.classList.add('winrate-yellow');
+        }
+
+        const buttonGroup = document.createElement('div');
+        buttonGroup.classList.add('button-group');
 
         const moveButton = document.createElement('button');
-        moveButton.classList.add('move-button');
         moveButton.textContent = '⇄';
+        moveButton.classList.add('move-button');
         moveButton.addEventListener('click', moveSummoner);
 
         const removeButton = document.createElement('button');
-        removeButton.classList.add('remove-button');
         removeButton.textContent = '✖';
+        removeButton.classList.add('remove-button');
         removeButton.addEventListener('click', removeSummoner);
 
-        actionButtons.appendChild(moveButton);
-        actionButtons.appendChild(removeButton);
+        buttonGroup.appendChild(moveButton);
+        buttonGroup.appendChild(removeButton);
 
-        playerInfo.appendChild(playerHeader);
-        playerInfo.appendChild(playerRankContainer);
-        playerInfo.appendChild(actionButtons);
+        cardContent.appendChild(nameHeading);
+        cardContent.appendChild(winrateParagraph);
+        cardContent.appendChild(buttonGroup);
 
-        li.appendChild(playerIcon);
-        li.appendChild(playerInfo);
+        const rankDiv = document.createElement('div');
+        rankDiv.classList.add('rank-div');
+
+        const rankImg = document.createElement('img');
+        rankImg.src = `/static/images/ranks/${summoner.tier.toLowerCase()}.webp`;
+        rankImg.alt = 'Rank';
+        rankImg.classList.add('rank-image');
+
+        const rankLabel = document.createElement('p');
+        rankLabel.classList.add('rank-label');
+        rankLabel.textContent = summoner.rank;
+
+        rankDiv.appendChild(rankImg);
+        rankDiv.appendChild(rankLabel);
+
+        card.appendChild(iconImg);
+        card.appendChild(cardContent);
+        card.appendChild(rankDiv);
+
+        li.appendChild(card);
 
         return li;
     }
@@ -155,36 +173,36 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
-                game_name: gameName, 
+            body: JSON.stringify({
+                game_name: gameName,
                 tag_line: tagLine,
                 num_of_matches: parseInt(numOfMatches)
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            // Hide loading spinner and enable button
-            hideSpinner();
-            addSummonerButton.disabled = false;
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner and enable button
+                hideSpinner();
+                addSummonerButton.disabled = false;
 
-            if (data.status === 'success') {
-                const summoner = data.summoner;
-                summoner.team = assignedTeam;
-                teams[assignedTeam].push(summoner);
-                localStorage.setItem('teams', JSON.stringify(teams));
-                renderTeams();
-                attachActionListeners();
-            } else {
-                alert(data.message || 'Failed to add summoner.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while adding the summoner.');
-            // Hide loading spinner and enable button
-            hideSpinner();
-            addSummonerButton.disabled = false;
-        });
+                if (data.status === 'success') {
+                    const summoner = data.summoner;
+                    summoner.team = assignedTeam;
+                    teams[assignedTeam].push(summoner);
+                    localStorage.setItem('teams', JSON.stringify(teams));
+                    renderTeams();
+                    attachActionListeners();
+                } else {
+                    alert(data.message || 'Failed to add summoner.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while adding the summoner.');
+                // Hide loading spinner and enable button
+                hideSpinner();
+                addSummonerButton.disabled = false;
+            });
 
         // Clear input fields
         gameNameInput.value = '';
@@ -237,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const [game_name, tag_line] = summonerFullName.split('#');
         const oldTeam = newTeam === 'team1' ? 'team2' : 'team1';
 
-        if (teams[newTeam].length >= 5) {
+        if (teams[newTeam].length > 5) {
             alert(`${newTeam === 'team1' ? 'Team 1' : 'Team 2'} is full. Please remove a player before moving another one.`);
             renderTeams();
             attachActionListeners();
@@ -360,3 +378,4 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTeams();
     attachActionListeners();
 });
+

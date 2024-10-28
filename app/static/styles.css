@@ -3,18 +3,19 @@
 /* CSS Variables for Reusability */
 :root {
     --font-primary: Arial, sans-serif;
-    --color-background: #0a0a2a; /* Very Dark Blue */
-    --color-text: #e0e0f0; /* Light Grayish Blue for readability */
+    --color-background: #0a0a2a;
+    --color-text: #e0e0f0;
     --color-white: #ffffff;
     --color-gray-light: #a0a0c0;
     --color-gray: #303060;
-    --color-dark: #050517; /* Even Darker Blue for accents */
-    --color-green: #2e8b57; /* Dark Sea Green */
+    --color-dark: #050517;
+    --color-green: #2e8b57;
     --color-green-hover: #276747;
-    --color-blue: #1e3a8a; /* Dark Blue */
+    --color-blue: #1e3a8a;
     --color-blue-hover: #1a305c;
-    --color-red: #8b0000; /* Dark Red */
+    --color-red: #8b0000;
     --color-red-hover: #700000;
+    --color-yellow: #ffcc00;
     --transition-speed: 0.3s;
 }
 
@@ -72,7 +73,7 @@ input[type="text"]::placeholder {
     color: var(--color-gray-light);
 }
 
-/* General Button Styles (excluding move and remove buttons) */
+/* General Button Styles */
 button:not(.move-button):not(.remove-button) {
     padding: 10px 15px;
     border: none;
@@ -138,7 +139,7 @@ button:hover {
     border-top: 3px solid var(--color-white);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    visibility: hidden; /* Hidden by default */
+    visibility: hidden;
 }
 
 @keyframes spin {
@@ -164,7 +165,7 @@ button:hover {
     font-size: 16px;
     margin-bottom: 10px;
     color: var(--color-white);
-    text-align: center; 
+    text-align: center;
 }
 
 #matches-slider {
@@ -213,6 +214,7 @@ button:hover {
     padding: 10px;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 .team h2 {
@@ -230,118 +232,107 @@ button:hover {
 }
 
 .player-item {
-    display: flex;
-    align-items: center;
-    padding: 12px; 
     margin: 5px 0;
-    background-color: #1e3a8a;
-    border: 1px solid var(--color-gray);
-    border-radius: 4px;
     cursor: grab;
-    position: relative;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .player-item:active {
     cursor: grabbing;
 }
 
-.player-icon {
-    margin-right: 10px;
+.card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-blue);
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    color: var(--color-white);
+    box-sizing: border-box;
 }
 
-.player-icon img {
-    width: 80px;
-    height: 80px;
+.card img {
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
 }
 
-.player-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.card-content {
+    text-align: center;
     flex-grow: 1;
-    width: 100%;
-    justify-content: center;
 }
 
-.player-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.player-name {
-    font-weight: bold;
+.card-content h2 {
+    font-size: 18px;
+    margin: 0;
     color: var(--color-white);
 }
 
-.player-rank-container {
+.card-content p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.winrate-green {
+    color: var(--color-green);
+}
+
+.winrate-yellow {
+    color: var(--color-yellow);
+}
+
+.winrate-red {
+    color: var(--color-red);
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
     margin-top: 5px;
 }
 
-.player-rank {
-    font-size: 0.9em;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    justify-content: center;
-}
-
-.rank-image {
-    width: 20px;
-    height: 20px;
-}
-
-/* Player Buttons: Swap and Delete */
-.remove-button,
-.move-button {
-    background: none;
+.button-group button {
+    padding: 5px 10px;
+    font-size: 18px;
     border: none;
-    font-size: 24px;
-    cursor: pointer;
-    margin-left: 5px;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 8px;
-    transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease; /* Added transition */
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
 }
 
-/* Specific Background Colors for Player Buttons */
 .move-button {
-    background-color: var(--color-blue);
-    color: var(--color-white);
+    background-color: var(--color-green);
 }
 
 .move-button:hover {
-    background-color: var(--color-blue-hover);
+    background-color: var(--color-green-hover);
 }
 
 .remove-button {
-    background-color: #b00020;
-    color: var(--color-white);
+    background-color: var(--color-red);
 }
 
 .remove-button:hover {
-    background-color: #870014; 
+    background-color: var(--color-red-hover);
 }
 
-/* Hover Effects for Player Buttons */
-.remove-button:hover,
-.move-button:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+.rank-label {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-white);
 }
 
-/* Adjustments for action buttons container */
-.action-buttons {
-    display: flex;
-    align-items: center;
+.rank-div {
+    text-align: center;
+}
+
+.rank-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
 }
 
 /* Error Message Styles */
@@ -353,25 +344,27 @@ button:hover {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .player-icon img {
-        width: 60px;
-        height: 60px;
-    }
-
-    .player-item {
-        padding: 8px;
-    }
-
     .main-title {
         font-size: 3em;
         padding-top: 1px;
     }
 
-    /* Adjust button sizes for smaller screens */
-    .remove-button,
-    .move-button {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+    .card img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card-content {
+        margin-top: 10px;
+    }
+
+    .team {
+        width: 100%;
+        margin: 10px 0;
     }
 }

@@ -4,50 +4,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>League Fair Teams</title> <!-- Updated browser title -->
+    <title>League Fair Teams</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <!-- Updated <h1> title with reduced padding and increased font size -->
     <h1 class="main-title">League Fair Teams</h1>
 
-    <!-- Main Controls Container -->
     <div class="main-controls">
-        <!-- Summoner Name Input Form -->
         <form method="POST" id="summoner-form" class="summoner-form">
             <input type="text" name="game_name" id="game-name" placeholder="Enter Game Name" required>
             <input type="text" name="tag_line" id="tag-line" placeholder="Enter Tag Line" required>
             
-            <!-- Slider for Matches to Analyze placed above the button -->
             <div class="slider-container">
                 <label for="matches-slider">Matches to Analyze</label>
                 <input type="range" id="matches-slider" name="num_of_matches" min="0" max="10" value="5">
                 <div id="slider-tooltip" class="slider-tooltip">5</div>
             </div>
             
-            <!-- Button and Spinner Container -->
             <div class="button-spinner-container">
                 <button type="submit" id="add-summoner-button">
                     <span id="button-text">Add Summoner</span>
                 </button>
-                <div id="button-spinner" class="spinner"></div> <!-- Spinner is always present but hidden -->
+                <div id="button-spinner" class="spinner"></div>
             </div>
         </form>
 
-        <!-- Buttons Container -->
         <div class="buttons-container">
-            <!-- Clear All Players Button -->
             <button type="button" id="clear-players-button" title="Clear All Players">🗑️</button>
-            <!-- Balance Teams Button -->
             <button type="button" id="balance-teams-button" title="Balance Teams">⚖️</button>
         </div>
     </div>
 
-    <!-- Error Message Display -->
     <p class="error" id="error-message" style="display:none;"></p>
 
     <div class="teams-container">
-        <!-- Team 1 -->
         <div class="team" id="team1">
             <h2>Team 1</h2>
             <ul id="list1" class="player-list">
@@ -55,7 +45,6 @@
             </ul>
         </div>
 
-        <!-- Team 2 -->
         <div class="team" id="team2">
             <h2>Team 2</h2>
             <ul id="list2" class="player-list">
@@ -64,7 +53,6 @@
         </div>
     </div>
 
-    <!-- Include SortableJS from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
