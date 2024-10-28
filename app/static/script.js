@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return li;
     }
 
-    // Initialize Sortable for Team 1
     new Sortable(team1List, {
         group: 'teams',
         animation: 150,
@@ -117,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initialize Sortable for Team 2
     new Sortable(team2List, {
         group: 'teams',
         animation: 150,
