@@ -4,6 +4,11 @@ from flask import Blueprint, render_template, request, jsonify, current_app
 import urllib.parse
 import requests
 from .mmr_calculator import MMRCalculator  # Import the new MMRCalculator module
+from .rate_limiter import RateLimiter
+import time
+
+# Create a global rate limiter instance
+rate_limiter = RateLimiter()
 
 routes = Blueprint('routes', __name__)
 
@@ -97,7 +102,6 @@ def get_summoner_data():
             correct_game_name = account_data.get('gameName', user_game_name)
             correct_tag_line = account_data.get('tagLine', user_tag_line)
 
-            # Now use the puuid to get additional summoner data
             encrypted_puuid = urllib.parse.quote(puuid)
             summoner_api_url = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{encrypted_puuid}?api_key={RIOT_API_KEY}"
             summoner_response = requests.get(summoner_api_url)

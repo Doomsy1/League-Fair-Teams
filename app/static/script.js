@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const cardContent = document.createElement('div');
         cardContent.classList.add('card-content');
 
+        const nameContainer = document.createElement('div');
+        nameContainer.classList.add('name-container');
+
         const nameHeading = document.createElement('h2');
         nameHeading.textContent = summoner.game_name;
         const tagSpan = document.createElement('span');
@@ -53,6 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tagSpan.style.opacity = '0.7';
         tagSpan.textContent = `#${summoner.tag_line}`;
         nameHeading.appendChild(tagSpan);
+        nameContainer.appendChild(nameHeading);
+
+        const winrateContainer = document.createElement('div');
+        winrateContainer.classList.add('winrate-container');
 
         const winrateParagraph = document.createElement('p');
         winrateParagraph.textContent = `${summoner.win_rate}% W/L`;
@@ -63,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             winrateParagraph.classList.add('winrate-yellow');
         }
+        winrateContainer.appendChild(winrateParagraph);
 
         const buttonGroup = document.createElement('div');
         buttonGroup.classList.add('button-group');
@@ -80,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
         buttonGroup.appendChild(moveButton);
         buttonGroup.appendChild(removeButton);
 
-        cardContent.appendChild(nameHeading);
-        cardContent.appendChild(winrateParagraph);
+        cardContent.appendChild(nameContainer);
+        cardContent.appendChild(winrateContainer);
         cardContent.appendChild(buttonGroup);
 
         const rankDiv = document.createElement('div');
