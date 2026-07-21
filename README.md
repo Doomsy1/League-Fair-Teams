@@ -5,6 +5,8 @@ summoners. Enter each player's Riot ID, pull their live ranked stats, and the
 app calculates a performance-weighted MMR for everyone and deals the players
 into two teams of five so the teams come out as even as possible.
 
+![League Fair Teams lobby view](docs/screenshot.png)
+
 ## The problem it solves
 
 Picking fair teams in custom 5v5 lobbies is usually a guessing game. Someone
@@ -75,3 +77,9 @@ the calculated MMR.
   Americas routing for account and match endpoints.
 - A simple sliding-window rate limiter is included to stay polite with the Riot
   API's per-second and per-two-minute request budgets.
+
+## License
+
+This project is released under the [MIT License](LICENSE). Riot Games and all
+related trademarks are property of Riot Games, Inc. This project is not
+endorsed by or affiliated with Riot Games.
